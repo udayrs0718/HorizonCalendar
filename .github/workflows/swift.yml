@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macos-13
+    strategy:
+      matrix:
+        xcode:
+        - '15.0' # Swift 5.9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: xcodebuild clean build -scheme HorizonCalendar -destination "generic/platform=iOS Simulator"
+      - name: Run tests
+        run: xcodebuild clean test -project HorizonCalendar.xcodeproj -scheme HorizonCalendar -destination "name=iPhone 14,OS=17.2"
+
+  lint-swift:
+    runs-on: macos-13
+    strategy:
+      matrix:
+        xcode:
+        - '15.0' # Swift 5.9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Swift
+        run: swift package --allow-writing-to-package-directory format --lint
